@@ -35,6 +35,31 @@ class AlienInvasion:
             if event.type == pygame.QUIT:
                 sys.exit()
 
+            elif event.type == pygame.KEYDOWN:
+                self.__check_keydown_events(event=event)
+
+            elif event.type == pygame.KEYUP:
+                self.__check_keyup_events(event=event)
+
+    def __check_keydown_events(self, event):
+        """ Função para verificar os eventos de Keydown """
+        if event.key in [pygame.K_RIGHT,  pygame.K_d]:
+            self.ship.moving_right = True
+        
+        elif event.key in [pygame.K_LEFT,  pygame.K_a]:
+            self.ship.moving_left = True
+
+        elif event.key == pygame.K_ESCAPE:
+            sys.exit()
+
+    def __check_keyup_events(self, event):
+        """ Função para verificar os eventos de Keyup """
+        if event.key in [pygame.K_RIGHT,  pygame.K_d]:
+            self.ship.moving_right = False
+        
+        elif event.key in [pygame.K_LEFT,  pygame.K_a]:
+            self.ship.moving_left = False
+
     def __update_screen(self):
         """ Redesenhando a tela a cada iteração """
         self.screen.fill(self.settings.bg_color)
@@ -47,6 +72,7 @@ class AlienInvasion:
         """ Inicia o Loop principal do jogo """
         while True:
             self.__check_events()
+            self.ship.update()
             self.__update_screen()
             self.clock.tick(60)
 
