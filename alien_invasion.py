@@ -3,6 +3,7 @@ import pygame
 
 from settings import Settings
 from ship     import Ship
+from bullet   import Bullet
 
 class AlienInvasion:
     """ Classe geral do Projeto para Inicialização """
@@ -26,7 +27,9 @@ class AlienInvasion:
         )
 
         pygame.display.set_caption("Alien Invasion")
-        self.ship = Ship(ai_game=self)
+        
+        self.ship    = Ship(ai_game=self)
+        self.bullets = pygame.sprite.Group()
 
 
     def __check_events(self):
@@ -49,6 +52,9 @@ class AlienInvasion:
         elif event.key in [pygame.K_LEFT,  pygame.K_a]:
             self.ship.moving_left = True
 
+        elif event.key == pygame.K_SPACE:
+            self.__fire_bullet()
+
         elif event.key == pygame.K_ESCAPE:
             sys.exit()
 
@@ -60,9 +66,30 @@ class AlienInvasion:
         elif event.key in [pygame.K_LEFT,  pygame.K_a]:
             self.ship.moving_left = False
 
+    def __fire_bullet(self):
+        """ Dispara um novo projétil e adiciona ao grupo de projéteis"""
+       
+        if len(self.bullets) < self.settings.bullet_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
+
+    def __update_bullets(self):
+        """ Atualiza a posição dos projéteis e descarta os antigos """
+        # Adiciona novos Projéteis
+        self.bullets.update()
+        
+        # Removendo Tiros que utrapassam o limite da tela
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
+
     def __update_screen(self):
         """ Redesenhando a tela a cada iteração """
         self.screen.fill(self.settings.bg_color)
+
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+
         self.ship.blitme()
 
         # Deixa a tela mais recente visivel
@@ -73,6 +100,7 @@ class AlienInvasion:
         while True:
             self.__check_events()
             self.ship.update()
+            self.__update_bullets()
             self.__update_screen()
             self.clock.tick(60)
 
